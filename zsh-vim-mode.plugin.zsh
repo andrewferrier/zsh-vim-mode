@@ -566,4 +566,10 @@ if [[ $_vim_mode_shopt_aliases = 1 ]]; then
    set -o aliases
 fi
 
+# Use beam shape cursor for each new prompt.
+_fix_cursor() {
+   echo -ne '\e[5 q'
+}
+precmd_functions+=(_fix_cursor)
+
 # vim:set ft=zsh sw=4 et fdm=marker:
