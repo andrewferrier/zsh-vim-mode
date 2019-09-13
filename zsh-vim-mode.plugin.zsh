@@ -2,6 +2,13 @@
 [[ -o aliases ]] && _vim_mode_shopt_aliases=1
 builtin set -o no_aliases
 
+
+
+
+if [[ $TERM = (dumb|linux|eterm-color) ]] || (( $+KONSOLE_PROFILE_NAME )); then
+    exit 0
+fi
+
 bindkey -v
 
 #${(%):-%x}_debug () { print -r "$(date) $@" >> /tmp/zsh-debug-vim-mode.log 2>&1 }
@@ -74,7 +81,6 @@ vim-mode-define-special-key Alt-Down   ''    "^[[1;3B" "^[^[[B"
 #done
 
 
-# + vim-mode-bindkey {{{1
 function vim-mode-bindkey () {
     local -a maps
     local command
@@ -123,95 +129,38 @@ function vim-mode-bindkey () {
 }
 
 
-# Emacs-like bindings {{{1
-vim-mode-bindkey viins vicmd -- beginning-of-line                  '^A'
-vim-mode-bindkey viins vicmd -- backward-char                      '^B'
-vim-mode-bindkey viins vicmd -- end-of-line                        '^E'
-vim-mode-bindkey viins vicmd -- forward-char                       '^F'
-vim-mode-bindkey viins vicmd -- kill-line                          '^K'
-vim-mode-bindkey viins vicmd -- history-incremental-pattern-search-backward '^R'
-vim-mode-bindkey viins vicmd -- history-incremental-pattern-search-forward  '^S'
-vim-mode-bindkey viins vicmd -- backward-kill-line                 '^U'
-vim-mode-bindkey viins vicmd -- backward-kill-word                 '^W'
-vim-mode-bindkey viins vicmd -- yank                               '^Y'
-vim-mode-bindkey viins vicmd -- undo                               '^_'
+# # Enable surround text-objects (quotes, brackets) {{{1
 
-vim-mode-bindkey viins vicmd -- backward-word                      '^[b'
-vim-mode-bindkey viins vicmd -- kill-word                          '^[d'
-vim-mode-bindkey viins vicmd -- forward-word                       '^[f'
-vim-mode-bindkey viins vicmd -- insert-last-word                   '^[.'
+# autoload -U select-bracketed
+# zle -N select-bracketed
+# for m in visual viopp; do
+#     for c in {a,i}${(s..)^:-'()[]{}<>bB'}; do
+#         vim-mode-bindkey $m -- select-bracketed $c
+#     done
+# done
 
-vim-mode-bindkey viins vicmd -- beginning-of-line                  Home
-vim-mode-bindkey viins vicmd -- end-of-line                        End
-vim-mode-bindkey viins vicmd -- backward-word                      Ctrl-Left
-vim-mode-bindkey viins vicmd -- backward-word                      Alt-Left
-vim-mode-bindkey viins vicmd -- forward-word                       Ctrl-Right
-vim-mode-bindkey viins vicmd -- forward-word                       Alt-Right
-vim-mode-bindkey viins vicmd -- up-line-or-history                 PgUp
-vim-mode-bindkey viins vicmd -- down-line-or-history               PgDown
+# autoload -U select-quoted
+# zle -N select-quoted
+# for m in visual viopp; do
+#     for c in {a,i}{\',\",\`}; do
+#         vim-mode-bindkey $m -- select-quoted $c
+#     done
+# done
 
-vim-mode-bindkey viins       -- overwrite-mode                     Insert
-vim-mode-bindkey viins       -- delete-char                        Delete
-vim-mode-bindkey viins       -- reverse-menu-complete              Shift-Tab
-vim-mode-bindkey viins       -- delete-char-or-list                '^D'
-vim-mode-bindkey viins       -- backward-delete-char               '^H'
-vim-mode-bindkey viins       -- backward-delete-char               '^?'
-vim-mode-bindkey viins       -- redisplay                          '^X^R'
-vim-mode-bindkey viins       -- run-help                           '^[h'
-
-vim-mode-bindkey       vicmd -- run-help                           'H'
-vim-mode-bindkey       vicmd -- redo                               'U'
-vim-mode-bindkey       vicmd -- vi-yank-eol                        'Y'
-
-# edit-command-line {{{1
-autoload -U edit-command-line
-zle -N edit-command-line
-vim-mode-bindkey viins       -- edit-command-line                  '^X^E'
-vim-mode-bindkey       vicmd -- edit-command-line                  '^V'
-
-# history-substring-search {{{1
-if [[ -n $HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND ]]; then
-    vim-mode-bindkey viins vicmd -- history-substring-search-up         '^P'
-    vim-mode-bindkey viins vicmd -- history-substring-search-down       '^N'
-    vim-mode-bindkey viins vicmd -- history-substring-search-up         Up
-    vim-mode-bindkey viins vicmd -- history-substring-search-down       Down
-else
-    vim-mode-bindkey viins vicmd -- history-beginning-search-backward   '^P'
-    vim-mode-bindkey viins vicmd -- history-beginning-search-forward    '^N'
-    vim-mode-bindkey viins vicmd -- history-beginning-search-backward   Up
-    vim-mode-bindkey viins vicmd -- history-beginning-search-forward    Down
-fi
-
-
-# Enable surround text-objects (quotes, brackets) {{{1
-
-autoload -U select-bracketed
-zle -N select-bracketed
-for m in visual viopp; do
-    for c in {a,i}${(s..)^:-'()[]{}<>bB'}; do
-        vim-mode-bindkey $m -- select-bracketed $c
-    done
-done
-
-autoload -U select-quoted
-zle -N select-quoted
-for m in visual viopp; do
-    for c in {a,i}{\',\",\`}; do
-        vim-mode-bindkey $m -- select-quoted $c
-    done
-done
-
-autoload -Uz surround
-zle -N delete-surround surround
-zle -N change-surround surround
-zle -N add-surround surround
-vim-mode-bindkey vicmd  -- change-surround cs
-vim-mode-bindkey vicmd  -- delete-surround ds
-vim-mode-bindkey vicmd  -- add-surround    ys
-vim-mode-bindkey visual -- add-surround    S
+# autoload -Uz surround
+# zle -N delete-surround surround
+# zle -N change-surround surround
+# zle -N add-surround surround
+# vim-mode-bindkey vicmd  -- change-surround cs
+# vim-mode-bindkey vicmd  -- delete-surround ds
+# vim-mode-bindkey vicmd  -- add-surround    ys
+# vim-mode-bindkey visual -- add-surround    S
 
 
 # Identifying the editing mode {{{1
+
+autoload -U edit-command-line
+zle -N edit-command-line
 
 autoload -Uz add-zsh-hook
 autoload -Uz add-zle-hook-widget
@@ -224,15 +173,14 @@ autoload -Uz add-zle-hook-widget
 typeset -g -a vim_mode_keymap_funcs=()
 
 vim-mode-precmd           () { vim-mode-handle-event precmd           "$KEYMAP" }
-add-zsh-hook precmd vim-mode-precmd
-
 vim-mode-isearch-update   () { vim-mode-handle-event isearch-update   "$KEYMAP" }
 vim-mode-isearch-exit     () { vim-mode-handle-event isearch-exit     "$KEYMAP" }
 vim-mode-line-pre-redraw  () { vim-mode-handle-event line-pre-redraw  "$KEYMAP" }
 
-() {
-    local w; for w in "$@"; do add-zle-hook-widget $w vim-mode-$w; done
-} isearch-exit isearch-update line-pre-redraw
+add-zsh-hook        precmd          vim-mode-precmd
+add-zle-hook-widget isearch-exit    vim-mode-isearch-exit
+add-zle-hook-widget isearch-update  vim-mode-isearch-update
+add-zle-hook-widget line-pre-redraw vim-mode-line-pre-redraw
 
 typeset -g vim_mode_keymap_state=
 
@@ -432,11 +380,6 @@ vim-mode-update-prompt () {
     zle reset-prompt
 }
 
-# Compatibility with oh-my-zsh vi-mode
-function vi_mode_prompt_info() {
-    print ${MODE_INDICATOR_PROMPT}
-}
-
 vim-mode-set-up-indicators
 vim_mode_keymap_funcs+=vim-mode-update-prompt
 
@@ -551,20 +494,10 @@ vim-mode-cursor-finish-hook() {
     vim-mode-set-cursor-style DEFAULT
 }
 
-if [[ $TERM = (dumb|linux|eterm-color) ]] || (( $+KONSOLE_PROFILE_NAME )); then
-    :
-else
-    vim_mode_keymap_funcs+=vim-mode-set-cursor-style
+vim_mode_keymap_funcs+=vim-mode-set-cursor-style
 
-    add-zsh-hook        precmd      vim-mode-cursor-init-hook
-    add-zle-hook-widget line-finish vim-mode-cursor-finish-hook
-fi
-
-# Restore shell option 'aliases'. This must be the last thing here.
-if [[ $_vim_mode_shopt_aliases = 1 ]]; then
-   unset _vim_mode_shopt_aliases
-   set -o aliases
-fi
+add-zsh-hook        precmd      vim-mode-cursor-init-hook
+add-zle-hook-widget line-finish vim-mode-cursor-finish-hook
 
 # Use beam shape cursor for each new prompt.
 _fix_cursor() {
@@ -572,4 +505,16 @@ _fix_cursor() {
 }
 precmd_functions+=(_fix_cursor)
 
-# vim:set ft=zsh sw=4 et fdm=marker:
+
+
+
+
+
+
+# Restore shell option 'aliases'. This must be the last thing here.
+if [[ $_vim_mode_shopt_aliases = 1 ]]; then
+   unset _vim_mode_shopt_aliases
+   set -o aliases
+fi
+
+# vim:set ft=zsh sw=4 et fdm=marker
