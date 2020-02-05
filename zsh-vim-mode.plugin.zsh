@@ -2,13 +2,6 @@
 [[ -o aliases ]] && _vim_mode_shopt_aliases=1
 builtin set -o no_aliases
 
-
-
-
-if [[ $TERM = (dumb|linux|eterm-color) ]] || (( $+KONSOLE_PROFILE_NAME )); then
-    exit 0
-fi
-
 bindkey -v
 
 #${(%):-%x}_debug () { print -r "$(date) $@" >> /tmp/zsh-debug-vim-mode.log 2>&1 }
